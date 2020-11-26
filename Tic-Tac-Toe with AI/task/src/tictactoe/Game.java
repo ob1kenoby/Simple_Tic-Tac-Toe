@@ -126,7 +126,11 @@ public class Game {
                 }
             }
         } while (incorrectInput);
-        field[x][y] = "X";
+        if (isMoveOfX()) {
+            field.placeMoveOnField(x, y, "X");
+        } else {
+            field.placeMoveOnField(x, y, "O");
+        }
     }
 
     private int getCoordinateFromInput(String coordinate) throws NumberFormatException {
