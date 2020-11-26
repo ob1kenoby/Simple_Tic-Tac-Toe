@@ -89,8 +89,8 @@ public class Game {
                 easyAIMove();
                 break;
         }
-        printField(field);
-        gameNotFinished = checkWinners(field);
+        field.printField();
+        gameIsOn = field.checkWinners();
     }
 
     boolean isMoveOfX() {
