@@ -98,30 +98,28 @@ public class Game {
 
     private void playerMove() {
         boolean incorrectInput = false;
-        int x;
-        int y;
+        int x = 0;
+        int y = 0;
         do {
             System.out.print("Enter the coordinates: ");
             String[] userInput = getUserInput().split("\\s");
             if (userInput.length == 2) {
-                x = getCoordinateFromInput(userInput[0]);
-                y = getCoordinateFromInput(userInput[1]);
                 try {
-                    coordinates[i] = Integer.parseInt(digit);
+                    x = getCoordinateFromInput(userInput[0]);
+                    y = getCoordinateFromInput(userInput[1]);
                 } catch (NumberFormatException numberFormatException) {
                     incorrectInput = true;
                     System.out.println("You should enter numbers!");
-                    break;
                 }
-                if (coordinates[i] < 1 || coordinates[i] > 3) {
+                if (!incorrectInput && (x < 0 || x > 2 || y < 0 || y > 2)) {
                     incorrectInput = true;
                     System.out.println("Coordinates should be from 1 to 3!");
-                    break;
                 }
+            } else {
+                incorrectInput = true;
+                System.out.println("Please enter two digits.");
             }
             if (!incorrectInput) {
-                x = 3 - coordinates[1];
-                y = coordinates[0] - 1;
                 String box = field[x][y];
                 if ("X".equals(box) || "O".equals(box)) {
                     incorrectInput = true;
@@ -131,6 +129,7 @@ public class Game {
         } while (incorrectInput);
     }
 
-    private int getCoordinateFromInput(String s) throws NumberFormatException {
+    private int getCoordinateFromInput(String coordinate) throws NumberFormatException {
+        return Integer.parseInt(coordinate) - 1;
     }
 }
