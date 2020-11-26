@@ -120,13 +120,13 @@ public class Game {
                 System.out.println("Please enter two digits.");
             }
             if (!incorrectInput) {
-                String box = field[x][y];
-                if ("X".equals(box) || "O".equals(box)) {
+                if (!field.isBoxEmpty(x, y)) {
                     incorrectInput = true;
                     System.out.println("This cell is occupied! Choose another one!");
                 }
             }
         } while (incorrectInput);
+        field[x][y] = "X";
     }
 
     private int getCoordinateFromInput(String coordinate) throws NumberFormatException {

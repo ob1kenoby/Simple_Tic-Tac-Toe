@@ -23,12 +23,6 @@ public class Main {
         System.out.println("Making move level \"easy\"");
     }
 
-    private static void playerMove(String[][] field, int[] coordinates) {
-        int x = coordinates[0];
-        int y = coordinates[1];
-        field[x][y] = "X";
-    }
-
     private static boolean checkWinners(String[][] field) {
         int xWinCount = 0;
         int oWinCount = 0;

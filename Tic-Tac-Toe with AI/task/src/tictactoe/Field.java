@@ -27,4 +27,8 @@ public class Field {
     boolean isBoxEmpty(int x, int y) {
         return " ".equals(field[x][y]);
     }
+
+    void placeMoveOnField(int x, int y, String symbol) {
+        field[x][y] = symbol;
+    }
 }
