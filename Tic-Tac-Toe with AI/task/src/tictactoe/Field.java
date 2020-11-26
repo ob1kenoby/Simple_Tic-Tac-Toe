@@ -23,4 +23,8 @@ public class Field {
         }
         System.out.println("---------");
     }
+
+    boolean isBoxEmpty(int x, int y) {
+        return " ".equals(field[x][y]);
+    }
 }
