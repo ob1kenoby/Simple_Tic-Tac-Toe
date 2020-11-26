@@ -1,5 +1,6 @@
 package tictactoe;
 
+import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
@@ -126,6 +127,10 @@ public class Game {
                 }
             }
         } while (incorrectInput);
+        makeAMove(x, y);
+    }
+
+    private void makeAMove(int x, int y) {
         if (isMoveOfX()) {
             field.placeMoveOnField(x, y, "X");
         } else {
@@ -135,5 +140,19 @@ public class Game {
 
     private int getCoordinateFromInput(String coordinate) throws NumberFormatException {
         return Integer.parseInt(coordinate) - 1;
+    }
+
+    private void easyAIMove() {
+        boolean madeMove = false;
+        while (!madeMove) {
+            Random random = new Random();
+            int x = random.nextInt(3);
+            int y = random.nextInt(3);
+            if (field.isBoxEmpty(x, y)) {
+                makeAMove(x, y);
+                madeMove = true;
+            }
+        }
+        System.out.println("Making move level \"easy\"");
     }
 }

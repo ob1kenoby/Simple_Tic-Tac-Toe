@@ -9,20 +9,6 @@ public class Main {
         }
     }
 
-    private static void computerMove(String[][] field) {
-        boolean madeMove = false;
-        while (!madeMove) {
-            Random random = new Random();
-            int x = random.nextInt(3);
-            int y = random.nextInt(3);
-            if (!("X".equals(field[x][y]) || "O".equals(field[x][y]))) {
-                field[x][y] = "O";
-                madeMove = true;
-            }
-        }
-        System.out.println("Making move level \"easy\"");
-    }
-
     private static boolean checkWinners(String[][] field) {
         int xWinCount = 0;
         int oWinCount = 0;
