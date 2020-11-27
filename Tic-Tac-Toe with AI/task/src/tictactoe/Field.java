@@ -1,7 +1,7 @@
 package tictactoe;
 
 public class Field {
-    private String[][] field = new String[3][3];
+    final private String[][] field = new String[3][3];
 
     public Field() {
         for (int i = 0; i < 3; i++) {
@@ -37,9 +37,6 @@ public class Field {
         int oWinCount = 0;
         int spaceCount = 0;
         boolean gameNotFinished = true;
-        for (int i = 0; i < 3; i++) {
-
-        }
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (" ".equals(field[i][j])) {

@@ -98,10 +98,11 @@ public class Game {
     }
 
     private void playerMove() {
-        boolean incorrectInput = false;
+        boolean incorrectInput;
         int x = 0;
         int y = 0;
         do {
+            incorrectInput = false;
             System.out.print("Enter the coordinates: ");
             String[] userInput = getUserInput().split("\\s");
             if (userInput.length == 2) {
