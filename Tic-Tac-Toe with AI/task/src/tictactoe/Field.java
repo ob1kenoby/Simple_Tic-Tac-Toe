@@ -2,6 +2,8 @@ package tictactoe;
 
 public class Field {
     final private String[][] field = new String[3][3];
+    int movesRemains = 9;
+    String winner;
 
     public Field() {
         for (int i = 0; i < 3; i++) {
@@ -30,19 +32,13 @@ public class Field {
 
     void placeMoveOnField(int x, int y, String symbol) {
         field[x][y] = symbol;
+        movesRemains--;
     }
 
-    boolean checkWinners() {
+    boolean checkIfWinner() {
         int xWinCount = 0;
         int oWinCount = 0;
-        int spaceCount = 0;
-        boolean gameNotFinished = true;
         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (" ".equals(field[i][j])) {
-                    spaceCount += 1;
-                }
-            }
             xWinCount += checkDirect(field[i], "X");
             oWinCount += checkDirect(field[i], "O");
             xWinCount += checkDirect(new String[]{field[0][i], field[1][i], field[2][i]}, "X");
@@ -50,17 +46,11 @@ public class Field {
         }
         xWinCount += checkDiagonals(field, "X");
         oWinCount += checkDiagonals(field, "O");
-        if (xWinCount > 0) {
-            System.out.println("X wins");
-            gameNotFinished = false;
-        } else if (oWinCount > 0) {
-            System.out.println("O wins");
-            gameNotFinished = false;
-        } else if (spaceCount == 0) {
-            System.out.println("Draw");
-            gameNotFinished = false;
+        if (xWinCount > 0 || oWinCount > 0) {
+            this.winner = (xWinCount > 0) ? "X" : "O";
+            return true;
         }
-        return gameNotFinished;
+        return false;
     }
 
     private static int checkDirect(String[] strings, String x) {
@@ -87,5 +77,28 @@ public class Field {
         victory = (countLeft == 3) ? victory + 1 : victory;
         victory = (countRight == 3) ? victory + 1 : victory;
         return victory;
+    }
+
+    boolean testMove(int x, int y, String symbol, boolean opposite) {
+        placeMoveOnField(x, y, symbol);
+        boolean canWin = checkIfWinner();
+        if (!canWin) {
+            movesRemains++;
+            field[x][y] = " ";
+        } else if (opposite) {
+            field[x][y] = "x".equals(symbol.toLowerCase()) ? "O" : "X";
+        }
+        return canWin;
+    }
+
+    public boolean canContinue() {
+        if (checkIfWinner()) {
+            System.out.printf("%s wins%n", winner);
+        } else if (movesRemains == 0) {
+            System.out.println("Draw");
+        } else {
+            return true;
+        }
+        return false;
     }
 }

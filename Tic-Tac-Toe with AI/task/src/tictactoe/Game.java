@@ -9,6 +9,7 @@ public class Game {
     private Field field;
     private boolean gameIsOn;
     private int moveNumber;
+    final private Scanner SCANNER = new Scanner(System.in);
 
     public Game() {
         this.gameIsOn = requestConfigFromUser();
@@ -35,7 +36,7 @@ public class Game {
         System.out.print("Input command: ");
         boolean incorrectInput = true;
         while (incorrectInput) {
-            String command = getUserInput();
+            String command = SCANNER.nextLine();
             if ("exit".equals(command.toLowerCase())) {
                 return false;
             } else {
@@ -54,14 +55,6 @@ public class Game {
             }
         }
         return true;
-    }
-
-    private String getUserInput() {
-        String userInput;
-        try (Scanner scanner = new Scanner(System.in)) {
-            userInput = scanner.nextLine();
-        }
-        return userInput;
     }
 
     private int setDifficulty(String difficulty) {
@@ -86,11 +79,16 @@ public class Game {
                 playerMove();
                 break;
             case 1:
+                System.out.println("Making move level \"easy\"");
                 easyAIMove();
+                break;
+            case 2:
+                System.out.println("Making move level \"medium\"");
+                mediumAIMove();
                 break;
         }
         field.printField();
-        gameIsOn = field.checkWinners();
+        gameIsOn = field.canContinue();
     }
 
     boolean isMoveOfX() {
@@ -104,7 +102,7 @@ public class Game {
         do {
             incorrectInput = false;
             System.out.print("Enter the coordinates: ");
-            String[] userInput = getUserInput().split("\\s");
+            String[] userInput = SCANNER.nextLine().split("\\s");
             if (userInput.length == 2) {
                 try {
                     x = getCoordinateFromInput(userInput[0]);
@@ -154,6 +152,44 @@ public class Game {
                 madeMove = true;
             }
         }
-        System.out.println("Making move level \"easy\"");
+    }
+
+    private void mediumAIMove() {
+        boolean canPrevent = testMoveForWin(true);
+        if (!canPrevent) {
+            boolean canWin = testMoveForWin(false);
+            if (!canWin) {
+                easyAIMove();
+            }
+        }
+    }
+
+    /**
+     * Goes through the whole gaming field and checks if an opponent can place a symbol on a winning combinations or
+     * the player that makes current move has winning combinations.
+     * @param opposite is true if the current check is to prevent the opposite player from winning;
+     *                 is false if checking for winning combinations for the current move.
+     * @return true if can place such symbol on a board.
+     */
+    private boolean testMoveForWin(boolean opposite) {
+        String symbol;
+        if (opposite) {
+            symbol = (isMoveOfX()) ? "O" : "X";
+        } else {
+            symbol = (isMoveOfX()) ? "X" : "O";
+        }
+        boolean canPreventOrWin = false;
+        outerLoop:
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (field.isBoxEmpty(i, j)) {
+                    canPreventOrWin = field.testMove(i, j, symbol, opposite);
+                }
+                if (canPreventOrWin) {
+                    break outerLoop;
+                }
+            }
+        }
+        return canPreventOrWin;
     }
 }
