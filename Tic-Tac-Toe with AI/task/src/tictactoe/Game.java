@@ -7,14 +7,8 @@ class Game {
     private Player playerX;
     private Player playerO;
     private Board board;
-
-    public boolean gameIsOn() {
-        return gameNotFinished;
-    }
-
     private boolean gameNotFinished;
     final private boolean launchNewGame;
-    private int moveNumber;
     final private Scanner SCANNER = new Scanner(System.in);
 
     public Game() {
@@ -22,8 +16,11 @@ class Game {
         this.gameNotFinished = this.launchNewGame;
         if (this.launchNewGame) {
             this.board = new Board(Board.generateEmptyBoard());
-            this.moveNumber = 0;
         }
+    }
+
+    public boolean gameIsOn() {
+        return gameNotFinished;
     }
 
     boolean isStarted() {
@@ -65,9 +62,8 @@ class Game {
     }
 
     void nextMove() {
-        moveNumber++;
         Player currentPlayer;
-        if (isMoveOfX()) {
+        if (board.isMoveOfX()) {
             currentPlayer = playerX;
         } else {
             currentPlayer = playerO;
@@ -91,10 +87,6 @@ class Game {
         }
         board.printBoard();
         gameNotFinished = board.canContinue();
-    }
-
-    boolean isMoveOfX() {
-        return (moveNumber % 2) == 1;
     }
 
     private void playerMove() {
@@ -132,7 +124,7 @@ class Game {
     }
 
     private void makeAMove(int x, int y) {
-        if (isMoveOfX()) {
+        if (board.isMoveOfX()) {
             board.placeMoveOnField(x, y, 'X');
         } else {
             board.placeMoveOnField(x, y, 'O');
@@ -186,9 +178,9 @@ class Game {
     private boolean testMoveForWin(boolean opposite) {
         char symbol;
         if (opposite) {
-            symbol = (isMoveOfX()) ? 'O' : 'X';
+            symbol = (board.isMoveOfX()) ? 'O' : 'X';
         } else {
-            symbol = (isMoveOfX()) ? 'X' : 'O';
+            symbol = (board.isMoveOfX()) ? 'X' : 'O';
         }
         boolean canPreventOrWin = false;
         outerLoop:

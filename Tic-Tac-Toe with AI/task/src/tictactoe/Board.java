@@ -111,4 +111,8 @@ class Board {
         }
         return false;
     }
+
+    boolean isMoveOfX() {
+        return (movesRemain % 2) == 0;
+    }
 }
