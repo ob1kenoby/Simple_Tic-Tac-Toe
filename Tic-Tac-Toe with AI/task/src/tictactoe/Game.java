@@ -7,20 +7,27 @@ public class Game {
     private int playerX; // 0 - user, 1 - easy
     private int playerO;
     private Field field;
+
+    public boolean gameIsOn() {
+        return gameIsOn;
+    }
+
     private boolean gameIsOn;
+    final private boolean gameStarted;
     private int moveNumber;
     final private Scanner SCANNER = new Scanner(System.in);
 
     public Game() {
-        this.gameIsOn = requestConfigFromUser();
-        if (this.gameIsOn) {
+        this.gameStarted = requestConfigFromUser();
+        this.gameIsOn = this.gameStarted;
+        if (this.gameStarted) {
             this.field = new Field();
             this.moveNumber = 0;
         }
     }
 
-    boolean gameIsOn() {
-        return this.gameIsOn;
+    boolean isStarted() {
+        return this.gameStarted;
     }
 
     /**
@@ -62,6 +69,7 @@ public class Game {
             case "user": return 0;
             case "easy": return 1;
             case "medium": return 2;
+            case "hard": return 3;
             default: return -1;
         }
     }
@@ -85,6 +93,10 @@ public class Game {
             case 2:
                 System.out.println("Making move level \"medium\"");
                 mediumAIMove();
+                break;
+            case 3:
+                System.out.println("Making move level \"hard\"");
+                hardAIMove();
                 break;
         }
         field.printField();
@@ -155,13 +167,16 @@ public class Game {
     }
 
     private void mediumAIMove() {
-        boolean canPrevent = testMoveForWin(true);
-        if (!canPrevent) {
-            boolean canWin = testMoveForWin(false);
-            if (!canWin) {
+        boolean canWin = testMoveForWin(false);
+        if (!canWin) {
+            boolean canPrevent = testMoveForWin(true);
+            if (!canPrevent) {
                 easyAIMove();
             }
         }
+    }
+
+    private void hardAIMove() {
     }
 
     /**
