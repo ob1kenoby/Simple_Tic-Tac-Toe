@@ -7,22 +7,23 @@ class Game {
     private Player playerX;
     private Player playerO;
     private Board board;
-    private boolean gameNotFinished;
     final private boolean launchNewGame;
     final private Scanner SCANNER = new Scanner(System.in);
 
     public Game() {
         this.launchNewGame = requestConfigFromUser();
-        this.gameNotFinished = this.launchNewGame;
         if (this.launchNewGame) {
             this.board = new Board(Board.generateEmptyBoard());
         }
     }
 
     public boolean gameIsOn() {
-        return gameNotFinished;
+        return board.getMovesRemain() > 0;
     }
 
+    /**
+     * @return true if user selected to launch next game.
+     */
     boolean isStarted() {
         return this.launchNewGame;
     }
@@ -45,7 +46,7 @@ class Game {
                 return false;
             } else {
                 String[] commandAsArray = command.split("\\s");
-                if (commandAsArray.length == 3 & "start".equals(commandAsArray[0].toLowerCase())) {
+                if (commandAsArray.length >= 3 & "start".equals(commandAsArray[0].toLowerCase())) {
                     incorrectInput = false;
                     playerX = new Player(commandAsArray[1]);
                     playerO = new Player(commandAsArray[2]);
@@ -62,31 +63,29 @@ class Game {
     }
 
     void nextMove() {
-        Player currentPlayer;
-        if (board.isMoveOfX()) {
-            currentPlayer = playerX;
-        } else {
-            currentPlayer = playerO;
-        }
+        Player currentPlayer = board.getCurrentMove() == 'X' ? playerX : playerO;
+        currentPlayer.printMove();
         switch (currentPlayer.getMODE()) {
             case USER:
                 playerMove();
                 break;
             case EASY:
-                System.out.println("Making move level \"easy\"");
                 easyAIMove();
                 break;
             case MEDIUM:
-                System.out.println("Making move level \"medium\"");
                 mediumAIMove();
                 break;
             case HARD:
-                System.out.println("Making move level \"hard\"");
                 hardAIMove();
                 break;
         }
         board.printBoard();
-        gameNotFinished = board.canContinue();
+        if (board.isWin(board.getCurrentMove())) {
+            System.out.printf("%s wins%n", board.getCurrentMove());;
+        } else if (!gameIsOn()) {
+            System.out.println("Draw");
+        }
+        board.passMoveToAnotherPlayer();
     }
 
     private void playerMove() {
@@ -120,15 +119,7 @@ class Game {
                 }
             }
         } while (incorrectInput);
-        makeAMove(x, y);
-    }
-
-    private void makeAMove(int x, int y) {
-        if (board.isMoveOfX()) {
-            board.placeMoveOnField(x, y, 'X');
-        } else {
-            board.placeMoveOnField(x, y, 'O');
-        }
+        board.makeMove(x, y);
     }
 
     private int getCoordinateFromInput(String coordinate) throws NumberFormatException {
@@ -141,31 +132,38 @@ class Game {
             Random random = new Random();
             int x = random.nextInt(3);
             int y = random.nextInt(3);
-            if (board.isBoxEmpty(x, y)) {
-                makeAMove(x, y);
-                madeMove = true;
+            madeMove = board.makeMove(x, y);
             }
         }
-    }
 
     private void mediumAIMove() {
-        boolean canWin = testMoveForWin(false);
-        if (!canWin) {
-            boolean canPrevent = testMoveForWin(true);
-            if (!canPrevent) {
-                easyAIMove();
-            }
-        }
+//        boolean canWin = testMoveForWin(false);
+//        if (!canWin) {
+//            boolean canPrevent = testMoveForWin(true);
+//            if (!canPrevent) {
+//                easyAIMove();
+//            }
+//        }
+        easyAIMove();
     }
 
     private void hardAIMove() {
-        boolean canWin = testMoveForWin(false);
-        if (!canWin) {
-            boolean canPrevent = testMoveForWin(true);
-            if (!canPrevent) {
-                easyAIMove();
+        Board newBoard = new Board(board.copyBoard());
+        int score = minimax(newBoard, true);
+    }
+
+    private int minimax(Board newBoard, boolean isOwn) {
+        if (newBoard.isWin(board.getCurrentMove())) {
+            if (isOwn) {
+                return 10;
+            } else {
+                return -10;
             }
+        } else if (newBoard.getMovesRemain() == 0) {
+            return 0;
         }
+
+        return 0;
     }
 
     /**
@@ -175,25 +173,25 @@ class Game {
      *                 is false if checking for winning combinations for the current move.
      * @return true if can place such symbol on a board.
      */
-    private boolean testMoveForWin(boolean opposite) {
-        char symbol;
-        if (opposite) {
-            symbol = (board.isMoveOfX()) ? 'O' : 'X';
-        } else {
-            symbol = (board.isMoveOfX()) ? 'X' : 'O';
-        }
-        boolean canPreventOrWin = false;
-        outerLoop:
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board.isBoxEmpty(i, j)) {
-                    canPreventOrWin = board.testMove(i, j, symbol, opposite);
-                }
-                if (canPreventOrWin) {
-                    break outerLoop;
-                }
-            }
-        }
-        return canPreventOrWin;
-    }
+//    private boolean testMoveForWin(boolean opposite) {
+//        char symbol;
+//        if (opposite) {
+//            symbol = (board.getCurrentMove()) ? 'O' : 'X';
+//        } else {
+//            symbol = (board.getCurrentMove()) ? 'X' : 'O';
+//        }
+//        boolean canPreventOrWin = false;
+//        outerLoop:
+//        for (int i = 0; i < 3; i++) {
+//            for (int j = 0; j < 3; j++) {
+//                if (board.isBoxEmpty(i, j)) {
+//                    canPreventOrWin = board.testMove(i, j, symbol, opposite);
+//                }
+//                if (canPreventOrWin) {
+//                    break outerLoop;
+//                }
+//            }
+//        }
+//        return canPreventOrWin;
+//    }
 }

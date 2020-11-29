@@ -4,15 +4,15 @@ import java.util.Arrays;
 
 class Board {
     final private char[][] BOARD;
-    int movesRemain = 9;
-    char winner;
+    private int movesRemain = 9;
+    private char currentMove = 'X';
 
     public Board(char[][] BOARD) {
         this.BOARD = Arrays.copyOf(BOARD, 3);
         printBoard();
     }
 
-    public static char[][] generateEmptyBoard() {
+    static char[][] generateEmptyBoard() {
         char[][] field = new char[3][3];
         for (char[] chars : field) {
             Arrays.fill(chars, ' ');
@@ -20,8 +20,75 @@ class Board {
         return field;
     }
 
-    public char[][] getBOARD() {
+    char[][] copyBoard() {
         return Arrays.copyOf(BOARD, 3);
+    }
+
+    int getMovesRemain() {
+        return movesRemain;
+    }
+
+    void passMoveToAnotherPlayer() {
+        currentMove = currentMove == 'X' ? 'O' : 'X';
+    }
+
+    boolean isBoxEmpty(int x, int y) {
+        return ' ' == BOARD[x][y];
+    }
+
+    boolean makeMove(int x, int y) {
+        if (isBoxEmpty(x, y)) {
+            BOARD[x][y] = currentMove;
+            movesRemain--;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isWin(char symbol) {
+        boolean win = false;
+        for (int i = 0; i < 3; i++) {
+            if (!win) {
+                win = checkDirect(BOARD[i], symbol);
+                if (!win) {
+                    win = checkDirect(new char[]{BOARD[0][i], BOARD[1][i], BOARD[2][i]}, symbol);
+                }
+            }
+        }
+        if (!win) {
+            win = checkDiagonals(symbol);
+        }
+        if (win) {
+            movesRemain = 0;
+        }
+        return win;
+    }
+
+    private static boolean checkDirect(char[] strings, char symbol) {
+        for (char spot : strings) {
+            if (symbol != spot) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkDiagonals(char symbol) {
+        int countLeft = 0;
+        int countRight = 0;
+        for (int i = 0; i < 3; i++) {
+            if (symbol == BOARD[i][i]) {
+                countLeft++;
+            }
+            if (symbol == BOARD[2-i][i]) {
+                countRight++;
+            }
+        }
+        return countLeft == 3 || countRight == 3;
+    }
+
+    char getCurrentMove() {
+        return currentMove;
     }
 
     void printBoard() {
@@ -36,83 +103,15 @@ class Board {
         System.out.println("---------");
     }
 
-    boolean isBoxEmpty(int x, int y) {
-        return ' ' == BOARD[x][y];
-    }
-
-    void placeMoveOnField(int x, int y, char symbol) {
-        BOARD[x][y] = symbol;
-        movesRemain--;
-    }
-
-    boolean checkIfWinner() {
-        int xWinCount = 0;
-        int oWinCount = 0;
-        for (int i = 0; i < 3; i++) {
-            xWinCount += checkDirect(BOARD[i], 'X');
-            oWinCount += checkDirect(BOARD[i], 'O');
-            xWinCount += checkDirect(new char[]{BOARD[0][i], BOARD[1][i], BOARD[2][i]}, 'X');
-            oWinCount += checkDirect(new char[]{BOARD[0][i], BOARD[1][i], BOARD[2][i]}, 'O');
-        }
-        xWinCount += checkDiagonals(BOARD, 'X');
-        oWinCount += checkDiagonals(BOARD, 'O');
-        if (xWinCount > 0 || oWinCount > 0) {
-            this.winner = (xWinCount > 0) ? 'X' : 'O';
-            return true;
-        }
-        return false;
-    }
-
-    private static int checkDirect(char[] strings, char x) {
-        for (char symbol : strings) {
-            if (x != symbol) {
-                return 0;
-            }
-        }
-        return 1;
-    }
-
-    private static int checkDiagonals(char[][] field, char x) {
-        int victory = 0;
-        int countLeft = 0;
-        int countRight = 0;
-        for (int i = 0; i < 3; i++) {
-            if (x == field[i][i]) {
-                countLeft++;
-            }
-            if (x == field[2-i][i]) {
-                countRight++;
-            }
-        }
-        victory = (countLeft == 3) ? victory + 1 : victory;
-        victory = (countRight == 3) ? victory + 1 : victory;
-        return victory;
-    }
-
-    boolean testMove(int x, int y, char symbol, boolean opposite) {
-        placeMoveOnField(x, y, symbol);
-        boolean canWin = checkIfWinner();
-        if (!canWin) {
-            movesRemain++;
-            BOARD[x][y] = ' ';
-        } else if (opposite) {
-            BOARD[x][y] = 'X' == symbol ? 'O' : 'X';
-        }
-        return canWin;
-    }
-
-    public boolean canContinue() {
-        if (checkIfWinner()) {
-            System.out.printf("%s wins%n", winner);
-        } else if (movesRemain == 0) {
-            System.out.println("Draw");
-        } else {
-            return true;
-        }
-        return false;
-    }
-
-    boolean isMoveOfX() {
-        return (movesRemain % 2) == 0;
-    }
+//    boolean testMove(int x, int y, char symbol, boolean opposite) {
+//        makeMove(x, y, symbol);
+//        boolean canWin = checkIfWinner();
+//        if (!canWin) {
+//            movesRemain++;
+//            BOARD[x][y] = ' ';
+//        } else if (opposite) {
+//            BOARD[x][y] = 'X' == symbol ? 'O' : 'X';
+//        }
+//        return canWin;
+//    }
 }

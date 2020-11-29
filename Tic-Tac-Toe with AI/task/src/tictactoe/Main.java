@@ -8,7 +8,7 @@ public class Main {
             while (game.gameIsOn()) {
                 game.nextMove();
             }
-            launchNewGame = game.isStarted();
+            launchNewGame = false;  // game.isStarted();
         }
     }
 }

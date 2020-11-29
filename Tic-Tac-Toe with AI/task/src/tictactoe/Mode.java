@@ -2,22 +2,26 @@ package tictactoe;
 
 enum Mode {
     USER("user"),
-    EASY("easy"),
-    MEDIUM("medium"),
-    HARD("hard");
+    EASY("easy"),       // Random move.
+    MEDIUM("medium"),   // Random move if not win or lose in one move. Then tries to win or lose in one move.
+    HARD("hard");       // Minimax algorithm.
 
-    String difficulty;
+    final private String DIFFICULTY;
 
     Mode(String difficulty) {
-        this.difficulty = difficulty;
+        this.DIFFICULTY = difficulty;
     }
 
-    public static Mode findModeByDifficulty(String difficulty) {
+    static Mode findModeByDifficulty(String difficulty) {
         for (Mode mode: values()) {
-            if (mode.difficulty.equals(difficulty.toLowerCase())) {
+            if (mode.DIFFICULTY.equals(difficulty.toLowerCase())) {
                 return mode;
             }
         }
         return null;
+    }
+
+    String getDifficulty() {
+        return DIFFICULTY;
     }
 }
