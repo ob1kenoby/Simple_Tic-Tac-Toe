@@ -143,9 +143,9 @@ public class Game {
 
     private void makeAMove(int x, int y) {
         if (isMoveOfX()) {
-            field.placeMoveOnField(x, y, "X");
+            field.placeMoveOnField(x, y, 'X');
         } else {
-            field.placeMoveOnField(x, y, "O");
+            field.placeMoveOnField(x, y, 'O');
         }
     }
 
@@ -177,6 +177,13 @@ public class Game {
     }
 
     private void hardAIMove() {
+        boolean canWin = testMoveForWin(false);
+        if (!canWin) {
+            boolean canPrevent = testMoveForWin(true);
+            if (!canPrevent) {
+                easyAIMove();
+            }
+        }
     }
 
     /**
@@ -187,11 +194,11 @@ public class Game {
      * @return true if can place such symbol on a board.
      */
     private boolean testMoveForWin(boolean opposite) {
-        String symbol;
+        char symbol;
         if (opposite) {
-            symbol = (isMoveOfX()) ? "O" : "X";
+            symbol = (isMoveOfX()) ? 'O' : 'X';
         } else {
-            symbol = (isMoveOfX()) ? "X" : "O";
+            symbol = (isMoveOfX()) ? 'X' : 'O';
         }
         boolean canPreventOrWin = false;
         outerLoop:

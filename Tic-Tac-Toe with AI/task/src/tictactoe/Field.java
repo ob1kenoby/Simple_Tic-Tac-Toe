@@ -1,14 +1,14 @@
 package tictactoe;
 
 public class Field {
-    final private String[][] field = new String[3][3];
+    final private char[][] field = new char[3][3];
     int movesRemains = 9;
-    String winner;
+    char winner;
 
     public Field() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                this.field[i][j] = " ";
+                this.field[i][j] = ' ';
             }
         }
         printField();
@@ -16,9 +16,9 @@ public class Field {
 
     void printField() {
         System.out.println("---------");
-        for (String[] row : field) {
+        for (char[] row : field) {
             System.out.print("| ");
-            for (String symbol : row) {
+            for (char symbol : row) {
                 System.out.print(symbol + " ");
             }
             System.out.println("|");
@@ -27,10 +27,10 @@ public class Field {
     }
 
     boolean isBoxEmpty(int x, int y) {
-        return " ".equals(field[x][y]);
+        return ' ' == field[x][y];
     }
 
-    void placeMoveOnField(int x, int y, String symbol) {
+    void placeMoveOnField(int x, int y, char symbol) {
         field[x][y] = symbol;
         movesRemains--;
     }
@@ -39,38 +39,38 @@ public class Field {
         int xWinCount = 0;
         int oWinCount = 0;
         for (int i = 0; i < 3; i++) {
-            xWinCount += checkDirect(field[i], "X");
-            oWinCount += checkDirect(field[i], "O");
-            xWinCount += checkDirect(new String[]{field[0][i], field[1][i], field[2][i]}, "X");
-            oWinCount += checkDirect(new String[]{field[0][i], field[1][i], field[2][i]}, "O");
+            xWinCount += checkDirect(field[i], 'X');
+            oWinCount += checkDirect(field[i], 'O');
+            xWinCount += checkDirect(new char[]{field[0][i], field[1][i], field[2][i]}, 'X');
+            oWinCount += checkDirect(new char[]{field[0][i], field[1][i], field[2][i]}, 'O');
         }
-        xWinCount += checkDiagonals(field, "X");
-        oWinCount += checkDiagonals(field, "O");
+        xWinCount += checkDiagonals(field, 'X');
+        oWinCount += checkDiagonals(field, 'O');
         if (xWinCount > 0 || oWinCount > 0) {
-            this.winner = (xWinCount > 0) ? "X" : "O";
+            this.winner = (xWinCount > 0) ? 'X' : 'O';
             return true;
         }
         return false;
     }
 
-    private static int checkDirect(String[] strings, String x) {
-        for (String symbol : strings) {
-            if (!x.equals(symbol)) {
+    private static int checkDirect(char[] strings, char x) {
+        for (char symbol : strings) {
+            if (x != symbol) {
                 return 0;
             }
         }
         return 1;
     }
 
-    private static int checkDiagonals(String[][] field, String x) {
+    private static int checkDiagonals(char[][] field, char x) {
         int victory = 0;
         int countLeft = 0;
         int countRight = 0;
         for (int i = 0; i < 3; i++) {
-            if (x.equals(field[i][i])) {
+            if (x == field[i][i]) {
                 countLeft++;
             }
-            if (x.equals(field[2-i][i])) {
+            if (x == field[2-i][i]) {
                 countRight++;
             }
         }
@@ -79,14 +79,14 @@ public class Field {
         return victory;
     }
 
-    boolean testMove(int x, int y, String symbol, boolean opposite) {
+    boolean testMove(int x, int y, char symbol, boolean opposite) {
         placeMoveOnField(x, y, symbol);
         boolean canWin = checkIfWinner();
         if (!canWin) {
             movesRemains++;
-            field[x][y] = " ";
+            field[x][y] = ' ';
         } else if (opposite) {
-            field[x][y] = "x".equals(symbol.toLowerCase()) ? "O" : "X";
+            field[x][y] = 'X' == symbol ? 'O' : 'X';
         }
         return canWin;
     }
