@@ -2,33 +2,31 @@ package tictactoe;
 
 import java.util.Arrays;
 
-public class Field {
-    private char[][] field;
+class Board {
+    final private char[][] BOARD;
     int movesRemain = 9;
     char winner;
 
-    public Field(char[][] field) {
-        this.field = Arrays.copyOf(field, 3);
-        printField();
+    public Board(char[][] BOARD) {
+        this.BOARD = Arrays.copyOf(BOARD, 3);
+        printBoard();
     }
 
-    public static char[][] generateEmptyField() {
+    public static char[][] generateEmptyBoard() {
         char[][] field = new char[3][3];
-        for (int i = 0; i < field.length; i++) {
-            for (int j = 0; j < field[i].length; j++) {
-                field[i][j] = ' ';
-            }
+        for (char[] chars : field) {
+            Arrays.fill(chars, ' ');
         }
         return field;
     }
 
-    public char[][] getField() {
-        return Arrays.copyOf(field, 3);
+    public char[][] getBOARD() {
+        return Arrays.copyOf(BOARD, 3);
     }
 
-    void printField() {
+    void printBoard() {
         System.out.println("---------");
-        for (char[] row : field) {
+        for (char[] row : BOARD) {
             System.out.print("| ");
             for (char symbol : row) {
                 System.out.print(symbol + " ");
@@ -39,11 +37,11 @@ public class Field {
     }
 
     boolean isBoxEmpty(int x, int y) {
-        return ' ' == field[x][y];
+        return ' ' == BOARD[x][y];
     }
 
     void placeMoveOnField(int x, int y, char symbol) {
-        field[x][y] = symbol;
+        BOARD[x][y] = symbol;
         movesRemain--;
     }
 
@@ -51,13 +49,13 @@ public class Field {
         int xWinCount = 0;
         int oWinCount = 0;
         for (int i = 0; i < 3; i++) {
-            xWinCount += checkDirect(field[i], 'X');
-            oWinCount += checkDirect(field[i], 'O');
-            xWinCount += checkDirect(new char[]{field[0][i], field[1][i], field[2][i]}, 'X');
-            oWinCount += checkDirect(new char[]{field[0][i], field[1][i], field[2][i]}, 'O');
+            xWinCount += checkDirect(BOARD[i], 'X');
+            oWinCount += checkDirect(BOARD[i], 'O');
+            xWinCount += checkDirect(new char[]{BOARD[0][i], BOARD[1][i], BOARD[2][i]}, 'X');
+            oWinCount += checkDirect(new char[]{BOARD[0][i], BOARD[1][i], BOARD[2][i]}, 'O');
         }
-        xWinCount += checkDiagonals(field, 'X');
-        oWinCount += checkDiagonals(field, 'O');
+        xWinCount += checkDiagonals(BOARD, 'X');
+        oWinCount += checkDiagonals(BOARD, 'O');
         if (xWinCount > 0 || oWinCount > 0) {
             this.winner = (xWinCount > 0) ? 'X' : 'O';
             return true;
@@ -96,9 +94,9 @@ public class Field {
         boolean canWin = checkIfWinner();
         if (!canWin) {
             movesRemain++;
-            field[x][y] = ' ';
+            BOARD[x][y] = ' ';
         } else if (opposite) {
-            field[x][y] = 'X' == symbol ? 'O' : 'X';
+            BOARD[x][y] = 'X' == symbol ? 'O' : 'X';
         }
         return canWin;
     }

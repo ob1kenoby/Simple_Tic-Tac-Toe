@@ -3,31 +3,31 @@ package tictactoe;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Game {
-    private int playerX; // 0 - user, 1 - easy
-    private int playerO;
-    private Field field;
+class Game {
+    private Player playerX;
+    private Player playerO;
+    private Board board;
 
     public boolean gameIsOn() {
-        return gameIsOn;
+        return gameNotFinished;
     }
 
-    private boolean gameIsOn;
-    final private boolean gameStarted;
+    private boolean gameNotFinished;
+    final private boolean launchNewGame;
     private int moveNumber;
     final private Scanner SCANNER = new Scanner(System.in);
 
     public Game() {
-        this.gameStarted = requestConfigFromUser();
-        this.gameIsOn = this.gameStarted;
-        if (this.gameStarted) {
-            this.field = new Field(Field.generateEmptyField());
+        this.launchNewGame = requestConfigFromUser();
+        this.gameNotFinished = this.launchNewGame;
+        if (this.launchNewGame) {
+            this.board = new Board(Board.generateEmptyBoard());
             this.moveNumber = 0;
         }
     }
 
     boolean isStarted() {
-        return this.gameStarted;
+        return this.launchNewGame;
     }
 
     /**
@@ -50,9 +50,9 @@ public class Game {
                 String[] commandAsArray = command.split("\\s");
                 if (commandAsArray.length == 3 & "start".equals(commandAsArray[0].toLowerCase())) {
                     incorrectInput = false;
-                    playerX = setDifficulty(commandAsArray[1]);
-                    playerO = setDifficulty(commandAsArray[2]);
-                    if (playerX < 0 || playerO < 0) {
+                    playerX = new Player(commandAsArray[1]);
+                    playerO = new Player(commandAsArray[2]);
+                    if (playerX.getMODE() == null || playerO.getMODE() == null) {
                         incorrectInput = true;
                     }
                 }
@@ -64,43 +64,33 @@ public class Game {
         return true;
     }
 
-    private int setDifficulty(String difficulty) {
-        switch (difficulty.toLowerCase()) {
-            case "user": return 0;
-            case "easy": return 1;
-            case "medium": return 2;
-            case "hard": return 3;
-            default: return -1;
-        }
-    }
-
     void nextMove() {
         moveNumber++;
-        int currentPlayer;
+        Player currentPlayer;
         if (isMoveOfX()) {
             currentPlayer = playerX;
         } else {
             currentPlayer = playerO;
         }
-        switch (currentPlayer) {
-            case 0:
+        switch (currentPlayer.getMODE()) {
+            case USER:
                 playerMove();
                 break;
-            case 1:
+            case EASY:
                 System.out.println("Making move level \"easy\"");
                 easyAIMove();
                 break;
-            case 2:
+            case MEDIUM:
                 System.out.println("Making move level \"medium\"");
                 mediumAIMove();
                 break;
-            case 3:
+            case HARD:
                 System.out.println("Making move level \"hard\"");
                 hardAIMove();
                 break;
         }
-        field.printField();
-        gameIsOn = field.canContinue();
+        board.printBoard();
+        gameNotFinished = board.canContinue();
     }
 
     boolean isMoveOfX() {
@@ -132,7 +122,7 @@ public class Game {
                 System.out.println("Please enter two digits.");
             }
             if (!incorrectInput) {
-                if (!field.isBoxEmpty(x, y)) {
+                if (!board.isBoxEmpty(x, y)) {
                     incorrectInput = true;
                     System.out.println("This cell is occupied! Choose another one!");
                 }
@@ -143,9 +133,9 @@ public class Game {
 
     private void makeAMove(int x, int y) {
         if (isMoveOfX()) {
-            field.placeMoveOnField(x, y, 'X');
+            board.placeMoveOnField(x, y, 'X');
         } else {
-            field.placeMoveOnField(x, y, 'O');
+            board.placeMoveOnField(x, y, 'O');
         }
     }
 
@@ -159,7 +149,7 @@ public class Game {
             Random random = new Random();
             int x = random.nextInt(3);
             int y = random.nextInt(3);
-            if (field.isBoxEmpty(x, y)) {
+            if (board.isBoxEmpty(x, y)) {
                 makeAMove(x, y);
                 madeMove = true;
             }
@@ -204,8 +194,8 @@ public class Game {
         outerLoop:
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (field.isBoxEmpty(i, j)) {
-                    canPreventOrWin = field.testMove(i, j, symbol, opposite);
+                if (board.isBoxEmpty(i, j)) {
+                    canPreventOrWin = board.testMove(i, j, symbol, opposite);
                 }
                 if (canPreventOrWin) {
                     break outerLoop;
