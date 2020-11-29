@@ -21,7 +21,7 @@ public class Game {
         this.gameStarted = requestConfigFromUser();
         this.gameIsOn = this.gameStarted;
         if (this.gameStarted) {
-            this.field = new Field();
+            this.field = new Field(Field.generateEmptyField());
             this.moveNumber = 0;
         }
     }

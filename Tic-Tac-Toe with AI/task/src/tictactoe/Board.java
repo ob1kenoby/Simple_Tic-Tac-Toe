@@ -1,17 +1,29 @@
 package tictactoe;
 
+import java.util.Arrays;
+
 public class Field {
-    final private char[][] field = new char[3][3];
-    int movesRemains = 9;
+    private char[][] field;
+    int movesRemain = 9;
     char winner;
 
-    public Field() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                this.field[i][j] = ' ';
+    public Field(char[][] field) {
+        this.field = Arrays.copyOf(field, 3);
+        printField();
+    }
+
+    public static char[][] generateEmptyField() {
+        char[][] field = new char[3][3];
+        for (int i = 0; i < field.length; i++) {
+            for (int j = 0; j < field[i].length; j++) {
+                field[i][j] = ' ';
             }
         }
-        printField();
+        return field;
+    }
+
+    public char[][] getField() {
+        return Arrays.copyOf(field, 3);
     }
 
     void printField() {
@@ -32,7 +44,7 @@ public class Field {
 
     void placeMoveOnField(int x, int y, char symbol) {
         field[x][y] = symbol;
-        movesRemains--;
+        movesRemain--;
     }
 
     boolean checkIfWinner() {
@@ -83,7 +95,7 @@ public class Field {
         placeMoveOnField(x, y, symbol);
         boolean canWin = checkIfWinner();
         if (!canWin) {
-            movesRemains++;
+            movesRemain++;
             field[x][y] = ' ';
         } else if (opposite) {
             field[x][y] = 'X' == symbol ? 'O' : 'X';
@@ -94,7 +106,7 @@ public class Field {
     public boolean canContinue() {
         if (checkIfWinner()) {
             System.out.printf("%s wins%n", winner);
-        } else if (movesRemains == 0) {
+        } else if (movesRemain == 0) {
             System.out.println("Draw");
         } else {
             return true;
