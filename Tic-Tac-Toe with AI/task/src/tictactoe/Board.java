@@ -3,13 +3,19 @@ package tictactoe;
 import java.util.Arrays;
 
 class Board {
-    final private char[][] BOARD;
-    private int movesRemain = 9;
-    private char currentMove = 'X';
+    private final char[][] board = new char[3][3];
+    private int movesRemain;
 
-    public Board(char[][] BOARD) {
-        this.BOARD = Arrays.copyOf(BOARD, 3);
-        printBoard();
+    public Board(char[][] board) {
+        this.movesRemain = 0;
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < 3; j++) {
+                this.board[i][j] = board[i][j];
+                if (board[i][j] == ' ') {
+                    movesRemain++;
+                }
+            }
+        }
     }
 
     static char[][] generateEmptyBoard() {
@@ -21,37 +27,34 @@ class Board {
     }
 
     char[][] copyBoard() {
-        return Arrays.copyOf(BOARD, 3);
+        return Arrays.copyOf(board, 3);
     }
 
     int getMovesRemain() {
         return movesRemain;
     }
 
-    void passMoveToAnotherPlayer() {
-        currentMove = currentMove == 'X' ? 'O' : 'X';
-    }
-
     boolean isBoxEmpty(int x, int y) {
-        return ' ' == BOARD[x][y];
+        return ' ' == board[x][y];
     }
 
     boolean makeMove(int x, int y) {
         if (isBoxEmpty(x, y)) {
-            BOARD[x][y] = currentMove;
+            board[x][y] = getCurrentMove();
             movesRemain--;
             return true;
         }
         return false;
     }
 
-    public boolean isWin(char symbol) {
+    public boolean isWin(char nextMove) {
+        char symbol = nextMove == 'O' ? 'X' : 'O';
         boolean win = false;
         for (int i = 0; i < 3; i++) {
             if (!win) {
-                win = checkDirect(BOARD[i], symbol);
+                win = checkDirect(board[i], symbol);
                 if (!win) {
-                    win = checkDirect(new char[]{BOARD[0][i], BOARD[1][i], BOARD[2][i]}, symbol);
+                    win = checkDirect(new char[]{board[0][i], board[1][i], board[2][i]}, symbol);
                 }
             }
         }
@@ -77,10 +80,10 @@ class Board {
         int countLeft = 0;
         int countRight = 0;
         for (int i = 0; i < 3; i++) {
-            if (symbol == BOARD[i][i]) {
+            if (symbol == board[i][i]) {
                 countLeft++;
             }
-            if (symbol == BOARD[2-i][i]) {
+            if (symbol == board[2-i][i]) {
                 countRight++;
             }
         }
@@ -88,12 +91,12 @@ class Board {
     }
 
     char getCurrentMove() {
-        return currentMove;
+        return movesRemain % 2 == 1 ? 'X' : 'O';
     }
 
     void printBoard() {
         System.out.println("---------");
-        for (char[] row : BOARD) {
+        for (char[] row : board) {
             System.out.print("| ");
             for (char symbol : row) {
                 System.out.print(symbol + " ");

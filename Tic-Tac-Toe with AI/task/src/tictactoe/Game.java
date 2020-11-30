@@ -1,7 +1,6 @@
 package tictactoe;
 
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 class Game {
     private Player playerX;
@@ -14,6 +13,7 @@ class Game {
         this.launchNewGame = requestConfigFromUser();
         if (this.launchNewGame) {
             this.board = new Board(Board.generateEmptyBoard());
+            board.printBoard();
         }
     }
 
@@ -81,11 +81,10 @@ class Game {
         }
         board.printBoard();
         if (board.isWin(board.getCurrentMove())) {
-            System.out.printf("%s wins%n", board.getCurrentMove());;
+            System.out.printf("%s wins%n", board.getCurrentMove());
         } else if (!gameIsOn()) {
             System.out.println("Draw");
         }
-        board.passMoveToAnotherPlayer();
     }
 
     private void playerMove() {
@@ -148,22 +147,70 @@ class Game {
     }
 
     private void hardAIMove() {
-        Board newBoard = new Board(board.copyBoard());
-        int score = minimax(newBoard, true);
+        int bestScore = Integer.MIN_VALUE;
+        int bestX = 0;
+        int bestY = 0;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board.isBoxEmpty(i, j)) {
+                    Board newBoard = new Board(board.copyBoard());
+                    newBoard.makeMove(i, j);
+                    int score = minimax(newBoard, true);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestX = i;
+                        bestY = j;
+                    }
+                }
+            }
+        }
+        board.makeMove(bestX, bestY);
+
     }
 
-    private int minimax(Board newBoard, boolean isOwn) {
-        if (newBoard.isWin(board.getCurrentMove())) {
+    private int minimax(Board board, boolean isOwn) {
+        if (board.isWin(board.getCurrentMove())) {
+            board.printBoard();
             if (isOwn) {
                 return 10;
             } else {
                 return -10;
             }
-        } else if (newBoard.getMovesRemain() == 0) {
+        } else if (board.getMovesRemain() == 0) {
+            board.printBoard();
             return 0;
         }
-
-        return 0;
+        int bestScore;
+        if (!isOwn) {
+            bestScore = Integer.MIN_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (board.isBoxEmpty(i, j)) {
+                        Board newBoard = new Board(board.copyBoard());
+                        newBoard.makeMove(i, j);
+                        int score = minimax(newBoard, false);
+                        if (score > bestScore) {
+                            bestScore = score;
+                        }
+                    }
+                }
+            }
+        } else {
+            bestScore = Integer.MAX_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (board.isBoxEmpty(i, j)) {
+                        Board newBoard = new Board(board.copyBoard());
+                        newBoard.makeMove(i, j);
+                        int score = minimax(newBoard, true);
+                        if (score < bestScore) {
+                            bestScore = score;
+                        }
+                    }
+                }
+            }
+        }
+        return bestScore;
     }
 
     /**
