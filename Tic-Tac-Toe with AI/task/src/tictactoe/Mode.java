@@ -3,7 +3,7 @@ package tictactoe;
 enum Mode {
     USER("user"),
     EASY("easy"),       // Random move.
-    MEDIUM("medium"),   // Random move if not win or lose in one move. Then tries to win or lose in one move.
+    MEDIUM("medium"),   // Attempts to win or prevent winning in one move. Random move otherwise.
     HARD("hard");       // Minimax algorithm.
 
     final private String DIFFICULTY;

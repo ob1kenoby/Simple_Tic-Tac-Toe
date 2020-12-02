@@ -17,8 +17,16 @@ class Game {
         }
     }
 
+    /**
+     * While this is true the game continues to prompt the next moves.
+     * @return true if game is launched and there are moves remaining
+     */
     public boolean gameIsOn() {
-        return board.getMovesRemain() > 0;
+        if (launchNewGame) {
+            return board.getMovesRemain() > 0;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -31,11 +39,9 @@ class Game {
     /**
      * Prompts user to start a game or exit. If the user chooses to start a game, they must specify difficulty by typing
      * "start difficulty difficulty" where first difficulty sets game mode for X player and the second for O player.
-     * Possible values for difficulty are:
-     *      user - user controlled player
-     *      easy - easy "AI"
-     * @return true if the parameters are correct and the game starts
-     *         false if user chooses to exit
+     * Possible values for difficulty are described in the Mode.java enum.
+     * @return true if the parameters are correct and the game starts;
+     *         false if user chooses to exit.
      */
     private boolean requestConfigFromUser() {
         System.out.print("Input command: ");
@@ -48,8 +54,8 @@ class Game {
                 String[] commandAsArray = command.split("\\s");
                 if (commandAsArray.length >= 3 & "start".equals(commandAsArray[0].toLowerCase())) {
                     incorrectInput = false;
-                    playerX = new Player(commandAsArray[1]);
-                    playerO = new Player(commandAsArray[2]);
+                    playerX = new Player(commandAsArray[1], 'X');
+                    playerO = new Player(commandAsArray[2], 'O');
                     if (playerX.getMODE() == null || playerO.getMODE() == null) {
                         incorrectInput = true;
                     }
@@ -80,8 +86,8 @@ class Game {
                 break;
         }
         board.printBoard();
-        if (board.isWin(board.getCurrentMove())) {
-            System.out.printf("%s wins%n", board.getCurrentMove());
+        if (board.isWin()) {
+            System.out.printf("%s wins%n", currentPlayer.getPLAYER());
         } else if (!gameIsOn()) {
             System.out.println("Draw");
         }
@@ -136,16 +142,46 @@ class Game {
         }
 
     private void mediumAIMove() {
-//        boolean canWin = testMoveForWin(false);
-//        if (!canWin) {
-//            boolean canPrevent = testMoveForWin(true);
-//            if (!canPrevent) {
-//                easyAIMove();
-//            }
-//        }
-        easyAIMove();
+        boolean canWin = testMoveForWin(true);
+        if (!canWin) {
+            boolean canPrevent = testMoveForWin(false);
+            if (!canPrevent) {
+                easyAIMove();
+            }
+        }
     }
 
+    /**
+     * Creates a new board and tests every cell on it for a possible victory or defeat.
+     * If finds such cell, then places a move on it.
+     * @param isOwn true if tests their own moves for victory;
+     *              false if tests for possible defeat.
+     * @return true if places a move.
+     */
+    private boolean testMoveForWin(boolean isOwn) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board.isBoxEmpty(i, j)) {
+                    Board testBoard = new Board(board.copyBoard());
+                    if (isOwn) {
+                        testBoard.makeMove(i, j);
+                    } else {
+                        testBoard.testOppositeMove(i, j);
+                    }
+                    if (testBoard.isWin()) {
+                        board.makeMove(i, j);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Iterates trough all the possible moves, creates new boards and calls a minimax algorithm to evaluate which move
+     * is the most beneficial. After evaluating makes such a move on the actual game board.
+     */
     private void hardAIMove() {
         int bestScore = Integer.MIN_VALUE;
         int bestX = 0;
@@ -169,41 +205,39 @@ class Game {
     }
 
     private int minimax(Board board, boolean isOwn) {
-        if (board.isWin(board.getCurrentMove())) {
-            board.printBoard();
+        if (board.isWin()) {
             if (isOwn) {
                 return 10;
             } else {
                 return -10;
             }
         } else if (board.getMovesRemain() == 0) {
-            board.printBoard();
             return 0;
         }
         int bestScore;
-        if (!isOwn) {
-            bestScore = Integer.MIN_VALUE;
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (board.isBoxEmpty(i, j)) {
-                        Board newBoard = new Board(board.copyBoard());
-                        newBoard.makeMove(i, j);
-                        int score = minimax(newBoard, false);
-                        if (score > bestScore) {
-                            bestScore = score;
-                        }
-                    }
-                }
-            }
-        } else {
+        if (isOwn) { // If is own, then minimising the result of the next opposite move.
             bestScore = Integer.MAX_VALUE;
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (board.isBoxEmpty(i, j)) {
                         Board newBoard = new Board(board.copyBoard());
                         newBoard.makeMove(i, j);
-                        int score = minimax(newBoard, true);
+                        int score = minimax(newBoard, false);
                         if (score < bestScore) {
+                            bestScore = score;
+                        }
+                    }
+                }
+            }
+        } else {  // If the move of the opponent, then maximising the results of our next move.
+            bestScore = Integer.MIN_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (board.isBoxEmpty(i, j)) {
+                        Board newBoard = new Board(board.copyBoard());
+                        newBoard.makeMove(i, j);
+                        int score = minimax(newBoard, true);
+                        if (score > bestScore) {
                             bestScore = score;
                         }
                     }
@@ -212,33 +246,4 @@ class Game {
         }
         return bestScore;
     }
-
-    /**
-     * Goes through the whole gaming field and checks if an opponent can place a symbol on a winning combinations or
-     * the player that makes current move has winning combinations.
-     * @param opposite is true if the current check is to prevent the opposite player from winning;
-     *                 is false if checking for winning combinations for the current move.
-     * @return true if can place such symbol on a board.
-     */
-//    private boolean testMoveForWin(boolean opposite) {
-//        char symbol;
-//        if (opposite) {
-//            symbol = (board.getCurrentMove()) ? 'O' : 'X';
-//        } else {
-//            symbol = (board.getCurrentMove()) ? 'X' : 'O';
-//        }
-//        boolean canPreventOrWin = false;
-//        outerLoop:
-//        for (int i = 0; i < 3; i++) {
-//            for (int j = 0; j < 3; j++) {
-//                if (board.isBoxEmpty(i, j)) {
-//                    canPreventOrWin = board.testMove(i, j, symbol, opposite);
-//                }
-//                if (canPreventOrWin) {
-//                    break outerLoop;
-//                }
-//            }
-//        }
-//        return canPreventOrWin;
-//    }
 }

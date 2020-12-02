@@ -6,6 +6,11 @@ class Board {
     private final char[][] board = new char[3][3];
     private int movesRemain;
 
+    /**
+     * Creation of a copy of the parameter array is needed to preserve the original board, while medium or hard AI
+     * iterates through possible moves and modifies the test boards.
+     * @param board is empty (filled with ' ') when the game starts.
+     */
     public Board(char[][] board) {
         this.movesRemain = 0;
         for (int i = 0; i < board.length; i++) {
@@ -18,6 +23,10 @@ class Board {
         }
     }
 
+    /**
+     * For the start of the game.
+     * @return empty board.
+     */
     static char[][] generateEmptyBoard() {
         char[][] field = new char[3][3];
         for (char[] chars : field) {
@@ -26,6 +35,10 @@ class Board {
         return field;
     }
 
+    /**
+     * Copy of the board is needed to create a new Board object on which medium and hard AI checks their scenarios.
+     * @return a copy of the current board.
+     */
     char[][] copyBoard() {
         return Arrays.copyOf(board, 3);
     }
@@ -40,15 +53,21 @@ class Board {
 
     boolean makeMove(int x, int y) {
         if (isBoxEmpty(x, y)) {
-            board[x][y] = getCurrentMove();
+            char symbol = getCurrentMove();
+            board[x][y] = symbol;
             movesRemain--;
             return true;
         }
         return false;
     }
 
-    public boolean isWin(char nextMove) {
-        char symbol = nextMove == 'O' ? 'X' : 'O';
+    public boolean isWin() {
+        boolean winX = checkIfSymbolWon('X');
+        boolean winO = checkIfSymbolWon('O');
+        return winX || winO;
+    }
+
+    private boolean checkIfSymbolWon(char symbol) {
         boolean win = false;
         for (int i = 0; i < 3; i++) {
             if (!win) {
@@ -62,7 +81,7 @@ class Board {
             win = checkDiagonals(symbol);
         }
         if (win) {
-            movesRemain = 0;
+            movesRemain = 0; // Stops the game after victory.
         }
         return win;
     }
@@ -106,15 +125,13 @@ class Board {
         System.out.println("---------");
     }
 
-//    boolean testMove(int x, int y, char symbol, boolean opposite) {
-//        makeMove(x, y, symbol);
-//        boolean canWin = checkIfWinner();
-//        if (!canWin) {
-//            movesRemain++;
-//            BOARD[x][y] = ' ';
-//        } else if (opposite) {
-//            BOARD[x][y] = 'X' == symbol ? 'O' : 'X';
-//        }
-//        return canWin;
-//    }
+    /**
+     * This method is required for medium AI, to test if the opponent can win by occupying the cell, which coordinates
+     * are passed as the parameters.
+     */
+    void testOppositeMove(int x, int y) {
+        char symbol = getCurrentMove() == 'X' ? 'O' : 'X';
+        board[x][y] = symbol;
+        movesRemain--;
+    }
 }
