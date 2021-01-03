@@ -1,5 +1,3 @@
-package tictactoe;
-
 class Player {
     final private Mode MODE;  // Difficulty or user control.
     final private char PLAYER;

@@ -1,5 +1,3 @@
-package tictactoe;
-
 enum Mode {
     USER("user"),
     EASY("easy"),       // Random move.

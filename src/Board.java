@@ -1,5 +1,3 @@
-package tictactoe;
-
 import java.util.Arrays;
 
 class Board {
